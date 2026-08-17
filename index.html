@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0a0f">
+  <title>JobFinder</title>
+  <meta name="description" content="JobFinder — Encuentra empleos adaptados a tu curriculum. PWA minimalista.">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="JobFinder">
+  <meta name="application-name" content="JobFinder">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512.png">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Install Banner -->
+  <div id="installBanner" class="install-banner hidden">
+    <div class="install-banner-inner">
+      <span class="install-icon">📥</span>
+      <span>Instalar JobFinder</span>
+      <button id="installBtn" class="btn-sm">Instalar</button>
+      <button id="installClose" class="btn-icon" aria-label="Cerrar">✕</button>
+    </div>
+  </div>
+
+  <!-- Splash Screen -->
+  <div id="splash" class="splash">
+    <div class="splash-content">
+      <div class="splash-logo">
+        <div class="logo-ring"></div>
+        <div class="logo-ring ring-2"></div>
+        <div class="logo-ring ring-3"></div>
+        <span class="logo-icon">💼</span>
+      </div>
+      <h1 class="splash-title">JobFinder</h1>
+      <p class="splash-sub">Empleos hechos para ti</p>
+      <div class="splash-loader">
+        <div class="loader-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- App Header -->
+  <header id="appHeader" class="app-header hidden">
+    <div class="header-left">
+      <span class="header-logo">💼</span>
+      <span class="header-brand">JobFinder</span>
+    </div>
+    <div class="header-right">
+      <button id="headerProfile" class="btn-icon" title="Mi perfil">👤</button>
+    </div>
+  </header>
+
+  <!-- Main App -->
+  <main id="appMain" class="app-main hidden">
+
+    <!-- ===== UPLOAD CV VIEW ===== -->
+    <section id="view-upload" class="view active">
+      <div class="view-center">
+        <div class="upload-card glass">
+          <div class="upload-icon-wrap">
+            <div class="pulse-ring"></div>
+            <div class="pulse-ring delay"></div>
+            <div class="upload-icon">📄</div>
+          </div>
+          <h2 class="upload-title">Sube tu CV</h2>
+          <p class="upload-sub">Arrastra un archivo PDF o TXT, o selecciónalo</p>
+          <div id="dropZone" class="drop-zone">
+            <div class="drop-zone-inner">
+              <span class="drop-icon">☁️</span>
+              <p>Arrastra tu CV aquí</p>
+              <p class="drop-or">o</p>
+              <label class="btn btn-primary">
+                Seleccionar archivo
+                <input type="file" id="fileInput" accept=".pdf,.txt" hidden>
+              </label>
+            </div>
+          </div>
+          <div id="fileInfo" class="file-info hidden">
+            <span class="file-icon">✅</span>
+            <span id="fileName"></span>
+            <button id="removeFile" class="btn-icon small">✕</button>
+          </div>
+          <div id="cvPreview" class="cv-preview hidden">
+            <h3>Tu perfil detectado</h3>
+            <div id="cvSkills" class="skills-grid"></div>
+            <div id="cvExperience" class="cv-section"></div>
+          </div>
+          <button id="btnSearch" class="btn btn-primary btn-lg hidden">
+            <span>🔍</span> Buscar empleos para mí
+          </button>
+          <div class="divider-or hidden" id="dividerOr">
+            <span>o</span>
+          </div>
+          <button id="btnManual" class="btn btn-ghost hidden">
+            Ingresar habilidades manualmente
+          </button>
+        </div>
+
+        <!-- Manual Input Card -->
+        <div id="manualCard" class="manual-card glass hidden">
+          <h2>Cuéntanos sobre ti</h2>
+          <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" id="manualName" placeholder="Tu nombre" class="input">
+          </div>
+          <div class="form-group">
+            <label>Habilidades (separa con coma)</label>
+            <input type="text" id="manualSkills" placeholder="JavaScript, React, Node.js..." class="input">
+          </div>
+          <div class="form-group">
+            <label>Experiencia</label>
+            <select id="manualExp" class="input">
+              <option value="junior">Junior (0-2 años)</option>
+              <option value="mid">Mid (2-5 años)</option>
+              <option value="senior">Senior (5+ años)</option>
+              <option value="lead">Lead / Manager</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Ubicación</label>
+            <input type="text" id="manualLocation" placeholder="Ciudad, País" class="input">
+          </div>
+          <button id="btnManualSearch" class="btn btn-primary btn-lg">
+            <span>🔍</span> Buscar empleos
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== RESULTS VIEW ===== -->
+    <section id="view-results" class="view">
+      <div class="results-header">
+        <div class="results-top">
+          <button id="btnBack" class="btn-icon">←</button>
+          <h2>Empleos para ti</h2>
+          <span id="jobCount" class="badge">0</span>
+        </div>
+        <div class="results-filters">
+          <div class="filter-chips" id="filterChips">
+            <button class="chip active" data-filter="all">Todos</button>
+            <button class="chip" data-filter="remote">Remoto</button>
+            <button class="chip" data-filter="hybrid">Híbrido</button>
+            <button class="chip" data-filter="onsite">Presencial</button>
+          </div>
+          <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Buscar por título o empresa..." class="input">
+          </div>
+        </div>
+      </div>
+      <div id="resultsList" class="results-list"></div>
+      <div id="noResults" class="no-results hidden">
+        <div class="no-results-icon">🔍</div>
+        <h3>No encontramos empleos</h3>
+        <p>Intenta con otras habilidades o ubicación</p>
+        <button id="btnRetry" class="btn btn-primary">Volver a buscar</button>
+      </div>
+    </section>
+
+    <!-- ===== JOB DETAIL VIEW ===== -->
+    <section id="view-detail" class="view">
+      <div class="detail-header">
+        <button id="btnDetailBack" class="btn-icon">←</button>
+        <h2>Detalle del empleo</h2>
+      </div>
+      <div id="detailContent" class="detail-content"></div>
+      <div class="detail-actions">
+        <button id="btnApply" class="btn btn-primary btn-lg btn-full">
+          <span>🚀</span> Postularme ahora
+        </button>
+        <button id="btnSave" class="btn btn-ghost btn-lg btn-full">
+          <span>♡</span> Guardar
+        </button>
+      </div>
+    </section>
+
+    <!-- ===== PROFILE VIEW ===== -->
+    <section id="view-profile" class="view">
+      <div class="profile-header">
+        <button id="btnProfileBack" class="btn-icon">←</button>
+        <h2>Mi perfil</h2>
+      </div>
+      <div class="profile-body">
+        <div class="profile-avatar">
+          <span>👤</span>
+        </div>
+        <h3 id="profileName" class="profile-name">—</h3>
+        <div id="profileSkills" class="skills-grid"></div>
+        <div class="profile-section">
+          <h4>Empleos guardados</h4>
+          <div id="savedJobs" class="saved-list"></div>
+        </div>
+        <div class="profile-section">
+          <h4>Preferencias</h4>
+          <div class="pref-row">
+            <span>Notificaciones</span>
+            <label class="toggle">
+              <input type="checkbox" id="prefNotif">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="pref-row">
+            <span>Tema oscuro</span>
+            <label class="toggle">
+              <input type="checkbox" id="prefDark" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+        <button id="btnReset" class="btn btn-ghost btn-full danger">Borrar todos mis datos</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <!-- Modal -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-overlay"></div>
+    <div class="modal-box glass">
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/jobs.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

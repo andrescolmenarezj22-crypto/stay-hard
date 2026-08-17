@@ -1,0 +1,11 @@
+node_modules/
+server.ps1
+start-app.bat
+test.html
+*.log
+
+# otros proyectos en la misma carpeta
+shadow-box/
+AsistentePersonal/
+brosato-go/
+0-luck-100-hard/
