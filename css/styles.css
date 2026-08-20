@@ -8,40 +8,40 @@
    ============================================================ */
 
 :root {
-  /* Dark Theme (Default) */
-  --bg-primary: #0a0a0f;
-  --bg-secondary: #111118;
-  --bg-tertiary: #1a1a24;
-  --bg-elevated: #222230;
-  --card-bg: #16161f;
-  --card-border: #2a2a3a;
+  /* Dark Theme (Default) — Negro + Gris, sin azul */
+  --bg-primary: #000000;
+  --bg-secondary: #0a0a0a;
+  --bg-tertiary: #1a1a1a;
+  --bg-elevated: #222222;
+  --card-bg: #111111;
+  --card-border: #2a2a2a;
   --text-primary: #ffffff;
-  --text-secondary: #b0b0c0;
-  --text-muted: #6b6b80;
-  --accent: #6c5ce7;
-  --accent-light: #a29bfe;
-  --accent-dark: #5a4bd1;
-  --accent-bg: rgba(108, 92, 231, 0.15);
-  --accent-glow: rgba(108, 92, 231, 0.4);
-  --success: #00cec9;
-  --success-bg: rgba(0, 206, 201, 0.15);
-  --warning: #fdcb6e;
-  --warning-bg: rgba(253, 203, 110, 0.15);
-  --danger: #ff6b6b;
-  --danger-bg: rgba(255, 107, 107, 0.15);
-  --info: #74b9ff;
-  --info-bg: rgba(116, 185, 255, 0.15);
-  --overlay-bg: rgba(0, 0, 0, 0.7);
-  --glass-bg: rgba(22, 22, 31, 0.75);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 20px rgba(108, 92, 231, 0.4);
-  --gradient-primary: linear-gradient(135deg, #6c5ce7, #a29bfe);
-  --gradient-success: linear-gradient(135deg, #00cec9, #55efc4);
-  --gradient-fire: linear-gradient(135deg, #ff6b6b, #fdcb6e);
-  --gradient-dark: linear-gradient(135deg, #0a0a0f, #1a1a24);
+  --text-secondary: #b0b0b0;
+  --text-muted: #666666;
+  --accent: #e0e0e0;
+  --accent-light: #ffffff;
+  --accent-dark: #999999;
+  --accent-bg: rgba(255, 255, 255, 0.08);
+  --accent-glow: rgba(255, 255, 255, 0.15);
+  --success: #4caf50;
+  --success-bg: rgba(76, 175, 80, 0.15);
+  --warning: #ff9800;
+  --warning-bg: rgba(255, 152, 0, 0.15);
+  --danger: #f44336;
+  --danger-bg: rgba(244, 67, 54, 0.15);
+  --info: #9e9e9e;
+  --info-bg: rgba(158, 158, 158, 0.15);
+  --overlay-bg: rgba(0, 0, 0, 0.85);
+  --glass-bg: rgba(17, 17, 17, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.7);
+  --shadow-glow: 0 0 15px rgba(255, 255, 255, 0.1);
+  --gradient-primary: linear-gradient(135deg, #333333, #555555);
+  --gradient-success: linear-gradient(135deg, #4caf50, #66bb6a);
+  --gradient-fire: linear-gradient(135deg, #f44336, #ff9800);
+  --gradient-dark: linear-gradient(135deg, #000000, #1a1a1a);
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
@@ -5812,6 +5812,384 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   gap: var(--space-sm);
   justify-content: center;
+}
+
+/* ============================================================
+   ROUTINE VIEW — Military Daily Schedule
+   ============================================================ */
+
+.routine-view {
+  padding-bottom: var(--space-2xl);
+}
+
+.routine-hero {
+  text-align: center;
+  padding: var(--space-xl) 0;
+  border-bottom: 1px solid var(--card-border);
+  margin-bottom: var(--space-xl);
+}
+
+.routine-hero-icon {
+  font-size: 3.5rem;
+  margin-bottom: var(--space-sm);
+}
+
+.routine-hero-title {
+  font-size: var(--font-3xl);
+  font-weight: 900;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+}
+
+.routine-hero-sub {
+  font-size: var(--font-lg);
+  color: var(--text-secondary);
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  margin-top: var(--space-xs);
+}
+
+.routine-hero-motto {
+  color: var(--text-muted);
+  font-style: italic;
+  margin-top: var(--space-md);
+}
+
+.routine-section {
+  margin-bottom: var(--space-xl);
+}
+
+.routine-section-title {
+  font-size: var(--font-lg);
+  font-weight: 700;
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--card-border);
+}
+
+/* Timeline */
+.routine-timeline {
+  position: relative;
+}
+
+.routine-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-sm) 0;
+  position: relative;
+}
+
+.routine-item.past {
+  opacity: 0.45;
+}
+
+.routine-item.current {
+  opacity: 1;
+}
+
+.routine-time {
+  width: 50px;
+  font-size: var(--font-sm);
+  font-weight: 700;
+  color: var(--text-muted);
+  text-align: right;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.routine-item.current .routine-time {
+  color: var(--text-primary);
+}
+
+.routine-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--bg-tertiary);
+  border: 2px solid var(--card-border);
+  flex-shrink: 0;
+  margin-top: 5px;
+  position: relative;
+  z-index: 1;
+}
+
+.routine-dot.active {
+  background: var(--text-primary);
+  border-color: var(--text-primary);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.routine-item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: calc(50px + var(--space-md) + 4px);
+  top: 20px;
+  width: 2px;
+  height: calc(100% - 10px);
+  background: var(--card-border);
+}
+
+.routine-item.current::before {
+  background: var(--accent);
+}
+
+.routine-content {
+  display: flex;
+  gap: var(--space-sm);
+  flex: 1;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+}
+
+.routine-item.current .routine-content {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.routine-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.routine-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.routine-name {
+  font-size: var(--font-base);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.routine-desc {
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+.routine-duration {
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+}
+
+/* Today Training */
+.routine-today-training {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.routine-training-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-md);
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--card-border);
+}
+
+.routine-training-name {
+  font-weight: 700;
+}
+
+.routine-training-dur {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+}
+
+.routine-training-exercises {
+  padding: var(--space-sm) var(--space-md);
+}
+
+.routine-exercise-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-sm) 0;
+  border-bottom: 1px solid var(--card-border);
+}
+
+.routine-exercise-row:last-child {
+  border-bottom: none;
+}
+
+.routine-exercise-name {
+  font-size: var(--font-sm);
+  font-weight: 500;
+}
+
+.routine-exercise-detail {
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  background: var(--bg-tertiary);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+}
+
+/* Week Plans */
+.routine-week-plans {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.week-plan-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+}
+
+.week-plan-item.today {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.week-plan-day {
+  width: 80px;
+  font-weight: 700;
+  font-size: var(--font-sm);
+  flex-shrink: 0;
+}
+
+.week-plan-name {
+  flex: 1;
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+}
+
+.week-plan-dur {
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+}
+
+.week-plan-badge {
+  font-size: var(--font-xs);
+  font-weight: 700;
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+}
+
+/* Habits */
+.routine-habits-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.routine-habit-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+}
+
+.routine-habit-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.routine-habit-name {
+  font-weight: 600;
+  font-size: var(--font-sm);
+}
+
+.routine-habit-goal {
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+/* Objectives */
+.routine-objectives {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-xs);
+}
+
+.routine-objective-item {
+  font-size: var(--font-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+}
+
+/* Challenges */
+.routine-challenges {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.routine-challenge-item {
+  font-size: var(--font-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+}
+
+/* Finance */
+.routine-finance {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-sm);
+}
+
+.finance-rule {
+  text-align: center;
+  padding: var(--space-md);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+}
+
+.finance-pct {
+  font-size: var(--font-2xl);
+  font-weight: 800;
+}
+
+.finance-label {
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  margin-top: var(--space-xs);
+}
+
+/* Lema */
+.routine-lema {
+  text-align: center;
+  padding: var(--space-xl);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+}
+
+.lema-text {
+  font-size: var(--font-xl);
+  font-weight: 900;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-primary);
 }
 
 /* View Title */

@@ -102,6 +102,7 @@
       case 'progress':App.renderProgress();break;case 'settings':App.renderSettings();break;case 'profile':App.renderProfile();break;
       case 'calendar':App.renderCalendar();break;case 'achievements':App.renderAchievements();break;case 'habits':App.renderHabits();break;
       case 'quotes':App.renderQuotes();break;case 'routine-editor':App.renderRoutineEditor(App.currentRoutine);break;
+      case 'routine':App.renderRoutineView();break;
     }
   };
 
@@ -927,6 +928,166 @@
     if(habits.some(function(h){return h.completedDates&&h.completedDates.indexOf(dateStr)>-1;}))return true;
     var dd=cal[dateStr];if(dd&&((dd.workouts||0)>0))return true;
     return false;
+  };
+
+  App.renderRoutineView = function() {
+    var c=document.getElementById('view-routine');
+    if(!c) return;
+    var dayOfWeek=new Date().getDay();
+    var training=window.Store.getTrainingForDay(dayOfWeek);
+    var trainingMin=Math.round(training.exercises.reduce(function(s,e){return s+e.duration;},0)/60);
+    var dayNamesES=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+    var schedule=[
+      {time:'7:00',icon:'🪖',name:'Despertar',desc:'Tender la cama. Tomar agua. Lavarse la cara. Nada de celular.',dur:'5 min'},
+      {time:'7:10',icon:'🧘',name:'Activación',desc:'Estiramientos: 10 minutos. Respiración profunda: 5 minutos.',dur:'15 min'},
+      {time:'7:25',icon:'🏃',name:'Cardio',desc:'Caminar o trotar durante 15 minutos.',dur:'15 min'},
+      {time:'7:45',icon:'💪',name:'Entrenamiento militar',desc:'Seguir el plan de entrenamiento semanal.',dur:trainingMin+' min'},
+      {time:'8:30',icon:'🚿',name:'Ducha',desc:'Agua fría si es posible.',dur:'10 min'},
+      {time:'8:45',icon:'🥗',name:'Desayuno saludable',desc:'Proteína, frutas, agua.',dur:'15 min'},
+      {time:'9:00',icon:'🎒',name:'Prepararme para la escuela',desc:'Ducharse, vestirse, arreglarse, preparar mochila, revisar útiles y tareas.',dur:'2 h'},
+      {time:'11:00',icon:'🍽️',name:'Almuerzo',desc:'Almuerzo saludable. Breve descanso.',dur:'1 h'},
+      {time:'12:00',icon:'😌',name:'Descanso / Relajación',desc:'Relajación y desconexión total.',dur:'30 min'},
+      {time:'12:30',icon:'🏫',name:'Escuela',desc:'Clases. Atención. Participación. Enfoque al 100%.',dur:'5.5 h'},
+      {time:'6:00',icon:'🏠',name:'Llegar a casa',desc:'Descanso breve. Hidratarse. Cambiarse.',dur:'15 min'},
+      {time:'6:15',icon:'🎮',name:'Tiempo libre',desc:'Relajarse. Ver algo ligero. Tiempo libre.',dur:'45 min'},
+      {time:'7:00',icon:'📚',name:'Segunda sesión',desc:'Estudiar. Leer. Hacer tareas. Aprender algo nuevo.',dur:'45 min'},
+      {time:'7:45',icon:'🎨',name:'Proyecto personal',desc:'Minecraft. Discord. Diseño. Edición. Crear contenido.',dur:'45 min'},
+      {time:'8:30',icon:'💰',name:'Finanzas',desc:'Registrar gastos. Revisar ingresos. Ahorrar. Revisar inversiones.',dur:'30 min'},
+      {time:'9:00',icon:'🧹',name:'Organización',desc:'Limpiar habitación. Organizar escritorio. Preparar ropa. Revisar agenda.',dur:'30 min'},
+      {time:'9:30',icon:'✅',name:'Tracker de hábitos',desc:'Marcar hábitos del día.',dur:'30 min'},
+      {time:'10:00',icon:'🌙',name:'Relajación',desc:'Música tranquila. Leer. Estiramientos. Sin pantallas.',dur:'20 min'},
+      {time:'10:20',icon:'😴',name:'Prepararse para dormir',desc:'Cepillarse los dientes. Preparar alima. Apagar/bajar las luces.',dur:'10 min'},
+      {time:'10:30',icon:'💤',name:'Dormir',desc:'Descansar para estar mejor al día siguiente. 8h 30min de sueño.',dur:'8.5 h'}
+    ];
+
+    var scheduleHTML=schedule.map(function(s,i){
+      var now=new Date();var parts=s.time.split(':');var sh=parseInt(parts[0]);var sm=parseInt(parts[1]);
+      var itemTime=new Date();itemTime.setHours(sh,sm,0,0);
+      var isPast=now>itemTime;
+      var isCurrent=false;
+      var nextTime=schedule[i+1]?schedule[i+1].time:null;
+      if(nextTime){
+        var np=nextTime.split(':');var nh=parseInt(np[0]);var nm=parseInt(np[1]);
+        var nextT=new Date();nextT.setHours(nh,nm,0,0);
+        if(now>=itemTime&&now<nextT) isCurrent=true;
+      } else if(now>=itemTime) isCurrent=true;
+      return '<div class="routine-item '+(isCurrent?'current':'')+' '+(isPast?'past':'')+'">'+
+        '<div class="routine-time">'+s.time+'</div>'+
+        '<div class="routine-dot'+(isCurrent?' active':'')+'"></div>'+
+        '<div class="routine-content">'+
+          '<div class="routine-icon">'+s.icon+'</div>'+
+          '<div class="routine-info">'+
+            '<h3 class="routine-name">'+s.name+'</h3>'+
+            '<p class="routine-desc">'+s.desc+'</p>'+
+            '<span class="routine-duration">'+s.dur+'</span>'+
+          '</div>'+
+        '</div>'+
+      '</div>';
+    }).join('');
+
+    var weekPlans=[1,2,3,4,5,6,0].map(function(dk){
+      var plan=window.Store.getTrainingForDay(dk);
+      var dur=Math.round(plan.exercises.reduce(function(s,e){return s+e.duration;},0)/60);
+      var isToday=dk===dayOfWeek;
+      return '<div class="week-plan-item'+(isToday?' today':'')+'">'+
+        '<div class="week-plan-day">'+dayNamesES[dk]+'</div>'+
+        '<div class="week-plan-name">'+plan.name+'</div>'+
+        '<div class="week-plan-dur">'+dur+' min — '+plan.exercises.length+' ejercicios</div>'+
+        (isToday?'<span class="week-plan-badge">HOY</span>':'')+
+      '</div>';
+    }).join('');
+
+    var habits=(window.Store?window.Store.get('habits'):[])||[];
+    var dayKeyNames=['dom','lun','mar','mie','jue','vie','sab'];
+    var todayKey=dayKeyNames[dayOfWeek];
+    var todayHabits=habits.filter(function(h){return h.days&&h.days.indexOf(todayKey)>-1;});
+    var habitsHTML=todayHabits.map(function(h){
+      return '<div class="routine-habit-item"><span class="routine-habit-icon">'+h.icon+'</span><span class="routine-habit-name">'+h.name+'</span><span class="routine-habit-goal">'+h.goal+'</span></div>';
+    }).join('');
+
+    var weekChallenges=[
+      'No gastar dinero innecesariamente',
+      'Completar todos los entrenamientos',
+      'Leer al menos 100 páginas en la semana',
+      'Aprender una habilidad nueva',
+      'Ahorrar al menos el 10% de cualquier ingreso',
+      'No faltar ningún día al tracker de hábitos',
+      'Mantener un promedio de 8 horas o más de sueño'
+    ];
+    var challengesHTML=weekChallenges.map(function(ch){
+      return '<div class="routine-challenge-item">• '+ch+'</div>';
+    }).join('');
+
+    var objectives=[
+      '10.000 pasos','2 litros de agua','Leer 15 páginas','Estudiar mínimo 2 horas',
+      'Entrenar','Ahorrar dinero','Registrar gastos','No procrastinar',
+      'Mantener el cuarto limpio','Dormir antes de las 10:30 p.m.'
+    ];
+    var objectivesHTML=objectives.map(function(o){
+      return '<div class="routine-objective-item">🎯 '+o+'</div>';
+    }).join('');
+
+    c.innerHTML='<div class="routine-view">'+
+      '<div class="routine-hero">'+
+        '<div class="routine-hero-icon">🪖</div>'+
+        '<h1 class="routine-hero-title">RUTINA MILITAR</h1>'+
+        '<p class="routine-hero-sub">MODO GUERRA</p>'+
+        '<p class="routine-hero-motto">Disciplina hoy, libertad mañana.</p>'+
+      '</div>'+
+
+      '<div class="routine-section">'+
+        '<h2 class="routine-section-title">⏰ Horario del día — '+dayNamesES[dayOfWeek]+'</h2>'+
+        '<div class="routine-timeline">'+scheduleHTML+'</div>'+
+      '</div>'+
+
+      '<div class="routine-section">'+
+        '<h2 class="routine-section-title">🏋️ Entrenamiento de hoy</h2>'+
+        '<div class="routine-today-training">'+
+          '<div class="routine-training-header"><span class="routine-training-name">'+training.name+'</span><span class="routine-training-dur">'+trainingMin+' min</span></div>'+
+          '<div class="routine-training-exercises">'+
+          training.exercises.map(function(ex){
+            var reps=ex.reps>1?' × '+ex.reps:'';
+            return '<div class="routine-exercise-row"><span class="routine-exercise-name">'+ex.name+'</span><span class="routine-exercise-detail">'+reps+(ex.sets>1?' × '+ex.sets+' series':'')+'</span></div>';
+          }).join('')+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+
+      '<div class="routine-section">'+
+        '<h2 class="routine-section-title">📋 Plan semanal de entrenamiento</h2>'+
+        '<div class="routine-week-plans">'+weekPlans+'</div>'+
+      '</div>'+
+
+      (habitsHTML?
+      '<div class="routine-section">'+
+        '<h2 class="routine-section-title">✅ Hábitos de hoy</h2>'+
+        '<div class="routine-habits-list">'+habitsHTML+'</div>'+
+      '</div>':'')+
+
+      '<div class="routine-section">'+
+        '<h2 class="routine-section-title">🎯 Objetivos diarios</h2>'+
+        '<div class="routine-objectives">'+objectivesHTML+'</div>'+
+      '</div>'+
+
+      '<div class="routine-section">'+
+        '<h2 class="routine-section-title">🏆 Retos semanales</h2>'+
+        '<div class="routine-challenges">'+challengesHTML+'</div>'+
+      '</div>'+
+
+      '<div class="routine-section">'+
+        '<h2 class="routine-section-title">💰 Control de dinero — Regla 50/30/20</h2>'+
+        '<div class="routine-finance">'+
+          '<div class="finance-rule"><div class="finance-pct">50%</div><div class="finance-label">Necesidades</div></div>'+
+          '<div class="finance-rule"><div class="finance-pct">30%</div><div class="finance-label">Deseos</div></div>'+
+          '<div class="finance-rule"><div class="finance-pct">20%</div><div class="finance-label">Ahorro / Deuda</div></div>'+
+        '</div>'+
+      '</div>'+
+
+      '<div class="routine-section routine-lema">'+
+        '<p class="lema-text">ENFOQUE + ACCIÓN = RESULTADOS</p>'+
+      '</div>'+
+
+    '</div>';
   };
 
   App.setupPWA = function() {
