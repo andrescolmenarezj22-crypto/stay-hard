@@ -4280,6 +4280,40 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: var(--shadow-glow);
 }
 
+.workout-card {
+  position: relative;
+}
+
+.workout-edit-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--card-border);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-fast);
+  z-index: 2;
+  opacity: 0;
+}
+
+.workout-card:hover .workout-edit-btn {
+  opacity: 1;
+}
+
+.workout-edit-btn:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
 .workout-icon {
   font-size: 2rem;
   margin-bottom: var(--space-sm);

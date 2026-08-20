@@ -101,7 +101,7 @@
       case 'home':App.renderHome();break;case 'train':App.renderTrain();break;case 'missions':App.renderMissions();break;
       case 'progress':App.renderProgress();break;case 'settings':App.renderSettings();break;case 'profile':App.renderProfile();break;
       case 'calendar':App.renderCalendar();break;case 'achievements':App.renderAchievements();break;case 'habits':App.renderHabits();break;
-      case 'quotes':App.renderQuotes();break;case 'routine-editor':App.renderRoutineEditor();break;
+      case 'quotes':App.renderQuotes();break;case 'routine-editor':App.renderRoutineEditor(App.currentRoutine);break;
     }
   };
 
@@ -227,23 +227,36 @@
 
   App.renderWorkoutCards = function(cat) {
     var routines=(window.Store?window.Store.get('routines'):[])||[];
+    var routineIds=routines.map(function(r){return r.id;});
     var workouts=DEFAULT_WORKOUTS.slice();
     routines.forEach(function(r){ if(r.active) workouts.push({id:r.id,name:r.name,category:r.category||'General',icon:'🏋️',duration:Math.round(r.exercises.reduce(function(s,e){return s+(e.duration||30);},0)/60),difficulty:'Personalizado',xp:20,exercises:r.exercises}); });
     if(cat!=='Todos') workouts=workouts.filter(function(w){return w.category===cat;});
     return workouts.map(function(w){
-      return '<div class="workout-card" data-id="'+w.id+'"><div class="workout-icon">'+(w.icon||'💪')+'</div><h3 class="workout-name">'+w.name+'</h3><div class="workout-meta"><span class="workout-duration">'+w.duration+' min</span><span class="workout-difficulty" style="color:'+App.utils.getDiffColor(w.difficulty)+'">'+w.difficulty+'</span><span class="workout-xp">+'+w.xp+' XP</span></div></div>';
+      var isCustom=routineIds.indexOf(w.id)>-1;
+      return '<div class="workout-card'+(isCustom?' custom-routine':'')+'" data-id="'+w.id+'">'+(isCustom?'<button class="workout-edit-btn" data-id="'+w.id+'" title="Editar rutina">✏️</button>':'')+'<div class="workout-icon">'+(w.icon||'💪')+'</div><h3 class="workout-name">'+w.name+'</h3><div class="workout-meta"><span class="workout-duration">'+w.duration+' min</span><span class="workout-difficulty" style="color:'+App.utils.getDiffColor(w.difficulty)+'">'+w.difficulty+'</span><span class="workout-xp">+'+w.xp+' XP</span></div></div>';
     }).join('');
   };
 
   App.attachWorkoutListeners = function() {
     document.querySelectorAll('.workout-card').forEach(function(card){
-      card.addEventListener('click',function(){ App.showWorkoutDetail(this.dataset.id); });
+      card.addEventListener('click',function(e){
+        if(e.target.closest('.workout-edit-btn')) return;
+        App.showWorkoutDetail(this.dataset.id);
+      });
+    });
+    document.querySelectorAll('.workout-edit-btn').forEach(function(btn){
+      btn.addEventListener('click',function(e){
+        e.stopPropagation();
+        App.currentRoutine=this.dataset.id;
+        App.navigate('routine-editor');
+      });
     });
   };
 
   App.showWorkoutDetail = function(wid) {
     var workout=DEFAULT_WORKOUTS.find(function(w){return w.id===wid;});
-    if(!workout){ var routines=(window.Store?window.Store.get('routines'):[])||[]; var r=routines.find(function(r){return r.id===wid;}); if(r) workout={id:r.id,name:r.name,category:r.category||'General',icon:'🏋️',duration:Math.round(r.exercises.reduce(function(s,e){return s+(e.duration||30);},0)/60),difficulty:'Personalizado',xp:20,exercises:r.exercises}; }
+    var isCustom=false;
+    if(!workout){ var routines=(window.Store?window.Store.get('routines'):[])||[]; var r=routines.find(function(r){return r.id===wid;}); if(r){workout={id:r.id,name:r.name,category:r.category||'General',icon:'🏋️',duration:Math.round(r.exercises.reduce(function(s,e){return s+(e.duration||30);},0)/60),difficulty:'Personalizado',xp:20,exercises:r.exercises};isCustom=true;} }
     if(!workout){App.showToast('No encontrado','error');return;}
     App.workoutData=workout;
     var c=document.getElementById('view-train');
@@ -253,10 +266,14 @@
       workout.exercises.map(function(ex,i){
         return '<div class="exercise-item"><div class="exercise-number">'+(i+1)+'</div><div class="exercise-info"><h3>'+ex.name+'</h3><p>'+(ex.description||'')+'</p><div class="exercise-meta">'+(ex.sets?'<span>Series: '+ex.sets+'</span>':'')+(ex.reps&&ex.reps>1?'<span>Reps: '+ex.reps+'</span>':'')+'<span>Tiempo: '+App.utils.formatTime(ex.duration)+'</span>'+(ex.rest?'<span>Descanso: '+ex.rest+'s</span>':'')+'</div></div></div>';
       }).join('')+'</div>'+
+      (isCustom?'<button class="btn btn-secondary btn-block" id="edit-routine-btn" style="margin-bottom:var(--space-sm);">✏️ Editar Rutina</button>':'')+
       '<button class="btn btn-primary btn-block start-workout-btn" id="start-workout">INICIAR ENTRENAMIENTO</button></div>';
 
     document.getElementById('back-to-train').addEventListener('click',function(){App.renderTrain();});
     document.getElementById('start-workout').addEventListener('click',function(){App.startTimer(workout);});
+    if(isCustom){
+      document.getElementById('edit-routine-btn').addEventListener('click',function(){App.currentRoutine=wid;App.navigate('routine-editor');});
+    }
   };
 
   App.timer = { state:'idle', currentExerciseIndex:0, currentTime:0, totalTime:0, restTime:0, isRest:false, currentRound:1, totalRounds:1, interval:null, workout:null, sessionStartTime:null };
