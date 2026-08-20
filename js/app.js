@@ -229,7 +229,14 @@
     var routines=(window.Store?window.Store.get('routines'):[])||[];
     var routineIds=routines.map(function(r){return r.id;});
     var workouts=DEFAULT_WORKOUTS.slice();
-    routines.forEach(function(r){ if(r.active) workouts.push({id:r.id,name:r.name,category:r.category||'General',icon:'🏋️',duration:Math.round(r.exercises.reduce(function(s,e){return s+(e.duration||30);},0)/60),difficulty:'Personalizado',xp:20,exercises:r.exercises}); });
+    routines.forEach(function(r){ if(r.active) workouts.push({id:r.id,name:r.name,category:r.category||'General',icon:r.icon||'🏋️',duration:Math.round(r.exercises.reduce(function(s,e){return s+(e.duration||30);},0)/60),difficulty:'Personalizado',xp:20,exercises:r.exercises}); });
+    var dayNames=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+    var dayKeys=[0,1,2,3,4,5,6];
+    dayKeys.forEach(function(dk){
+      var plan=window.Store.getTrainingForDay(dk);
+      var dur=Math.round(plan.exercises.reduce(function(s,e){return s+e.duration;},0)/60);
+      workouts.push({id:'training-'+dk,name:plan.name,category:'Fuerza',icon:'⚔️',duration:dur,difficulty:'Difícil',xp:30,exercises:plan.exercises});
+    });
     if(cat!=='Todos') workouts=workouts.filter(function(w){return w.category===cat;});
     return workouts.map(function(w){
       var isCustom=routineIds.indexOf(w.id)>-1;
@@ -475,20 +482,27 @@
     if(missions[today]&&missions[today].length>0) return;
     var routines=(window.Store?window.Store.get('routines'):[])||[];
     var habits=(window.Store?window.Store.get('habits'):[])||[];
-    var daily=[];
-    daily.push({id:App.utils.generateId(),name:'Calentamiento Matutino',desc:'Realiza tu calentamiento diario',icon:'🔥',duration:10,xp:15,difficulty:'Fácil',type:'routine',status:'pending'});
-    if(routines.some(function(r){return r.active;})){
-      daily.push({id:App.utils.generateId(),name:'Entrenamiento Principal',desc:'Completa tu entrenamiento del día',icon:'💪',duration:30,xp:25,difficulty:'Medio',type:'workout',status:'pending'});
-    }
     var dayOfWeek=new Date().getDay();
     var dayNames=['dom','lun','mar','mie','jue','vie','sab'];
+    var daily=[];
+    daily.push({id:App.utils.generateId(),name:'Despertar — Tender la cama, tomar agua',desc:'7:00 AM. Nada de celular.',icon:'🪖',duration:2,xp:15,difficulty:'Fácil',type:'routine',status:'pending'});
+    daily.push({id:App.utils.generateId(),name:'Activación — Estiramientos y respiración',desc:'7:10 AM. 10 min estiramientos + 5 min respiración.',icon:'🧘',duration:15,xp:15,difficulty:'Fácil',type:'routine',status:'pending'});
+    daily.push({id:App.utils.generateId(),name:'Cardio — Caminar o trotar',desc:'7:25 AM. 15 minutos sin parar.',icon:'🏃',duration:15,xp:20,difficulty:'Medio',type:'workout',status:'pending'});
+    var training=window.Store.getTrainingForDay(dayOfWeek);
+    var trainingMin=Math.round(training.exercises.reduce(function(s,e){return s+e.duration;},0)/60);
+    daily.push({id:App.utils.generateId(),name:training.name,desc:training.exercises.length+' ejercicios — '+trainingMin+' min',icon:'💪',duration:trainingMin,xp:30,difficulty:'Difícil',type:'workout',status:'pending'});
+    daily.push({id:App.utils.generateId(),name:'Ducha',desc:'8:30 AM. Agua fría si es posible.',icon:'🚿',duration:10,xp:10,difficulty:'Fácil',type:'routine',status:'pending'});
+    daily.push({id:App.utils.generateId(),name:'Desayuno saludable',desc:'8:45 AM. Proteína, frutas, agua.',icon:'🥗',duration:10,xp:10,difficulty:'Fácil',type:'routine',status:'pending'});
     habits.forEach(function(h){
       if(h.days&&h.days.length>0&&h.days.indexOf(dayNames[dayOfWeek])>-1){
         daily.push({id:App.utils.generateId(),name:h.name,desc:h.goal||'',icon:h.icon||'✅',duration:5,xp:h.xp||10,difficulty:'Fácil',type:'habit',status:'pending'});
       }
     });
-    daily.push({id:App.utils.generateId(),name:'Movilidad y Estiramiento',desc:'Estira tu cuerpo al final del día',icon:'🧘',duration:10,xp:15,difficulty:'Fácil',type:'routine',status:'pending'});
-    daily.push({id:App.utils.generateId(),name:'Rutina Nocturna',desc:'Prepárate para dormir bien',icon:'🌙',duration:10,xp:15,difficulty:'Fácil',type:'routine',status:'pending'});
+    daily.push({id:App.utils.generateId(),name:'Segunda sesión — Estudiar / Leer',desc:'7:00–7:45 PM. Aprender algo nuevo.',icon:'📚',duration:45,xp:20,difficulty:'Medio',type:'routine',status:'pending'});
+    daily.push({id:App.utils.generateId(),name:'Finanzas — Registrar gastos',desc:'8:30–9:00 PM. Ahorrar, revisar inversiones.',icon:'💰',duration:30,xp:15,difficulty:'Fácil',type:'routine',status:'pending'});
+    daily.push({id:App.utils.generateId(),name:'Organización — Limpiar y preparar',desc:'9:00–9:30 PM. Habitación, escritorio, ropa, agenda.',icon:'🧹',duration:30,xp:15,difficulty:'Fácil',type:'routine',status:'pending'});
+    daily.push({id:App.utils.generateId(),name:'Relajación — Sin pantallas',desc:'10:00–10:20 PM. Música, leer, estiramientos.',icon:'🌙',duration:20,xp:10,difficulty:'Fácil',type:'routine',status:'pending'});
+    daily.push({id:App.utils.generateId(),name:'Prepararse para dormir',desc:'10:20–10:30 PM. Cepillarse, alarma, luces bajas.',icon:'😴',duration:10,xp:10,difficulty:'Fácil',type:'routine',status:'pending'});
     missions[today]=daily;
     if(window.Store) window.Store.set('missions',missions);
   };
